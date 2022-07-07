@@ -79,7 +79,6 @@ if command == "R":
 # 余裕があったら日付制御機能つけるnow()より後の日付はNG
 
 # コマンドFで実行・・・自動で表示箇所選択
-# 指定のpig_noの情報をリスト化
 if command == "F":
     find_no = input("出産情報を確認する母豚NOを入力してください > ")
     number_l = list_number(find_no)
@@ -87,7 +86,4 @@ if command == "F":
     pig_info(find_no, number_l, day_l)
 
 
-# if born_num12(リスト[12]) != 0: born12を表示
-# elif born_num11(リスト[11]) != 0: born11を表示
-# elif born_num10(リスト[10]) != 0: born10を表示
-# 最初の表示が実行されたら処理がストップ
+# コマンドFで実行・・・自動で表示箇所選択

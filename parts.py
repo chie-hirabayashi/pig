@@ -1,4 +1,6 @@
 from datetime import datetime
+
+# from multiprocessing.spawn import old_main_modules
 from db_config import Day
 from db_config import Number
 from dateutil import relativedelta
@@ -8,9 +10,6 @@ from dateutil import relativedelta
 
 # for n in Number.select():
 # print(type(n.pub_datetime))
-
-# d = Day.get(Day.pig_no == "10-28")
-# print(d.pig_no)
 
 
 """ リスト作成 """
@@ -64,10 +63,9 @@ def list_day(pig_no):  # dayリスト
 
 
 # リスト作成コード
-# pig_no = "10-28"
+# pig_no = "99-99"
 # List = list_number(pig_no)  # numberのリスト作成
 # List = list_day(pig_no)  # dayのリスト作成
-# print(List)
 
 
 """ Aコマンドで使用 """
@@ -247,7 +245,6 @@ def in_born_data12(pig_no, new_day, new_num):  # born12用関数
 """ Fコマンドで使用 """
 
 
-"""
 def pig_info(pig_no, number_l, day_l):
     day_time_l = []
     for n in range(2, 13):
@@ -257,7 +254,7 @@ def pig_info(pig_no, number_l, day_l):
         day_time_l.append(t_day)
 
     idx = 10  # 初期値を設定 possibly unbound 回避
-    for n in range(0, 10):
+    for n in range(0, 10):  # 直近の出産日index取得
         if day_time_l[n].days < 0:
             idx = day_time_l.index(day_time_l[n])
             break
@@ -269,58 +266,48 @@ def pig_info(pig_no, number_l, day_l):
     else:
         rotate = 365 / day_time_l[(idx - 1)].days  # 回転数算出
 
+    d = Day.get(Day.pig_no == pig_no)
+    add_day = (datetime.strptime(d.add_day, "%Y/%m/%d")).strftime("%Y%m%d")
+    today = (datetime.now()).strftime("%Y%m%d")
+    old = int((int(today) - int(add_day) + 600) / 10000)
+
     print(
         f"NO.{pig_no}",
+        f"年齢:{old}歳",
         f"出産日:{day_l[idx+2]}",
         f"出産頭数:{number_l[idx+1]}匹",
         f"回転数:{round(rotate, 2)}回",
     )
-"""
 
 
-def pig_info(pig_no, number_l, day_l):
-    day_time_l = []
-    for n in range(2, 13):
-        t_day = datetime.strptime(
-            day_l[n + 1], "%Y/%m/%d") - datetime.strptime(
-            day_l[n], "%Y/%m/%d"
-        )
-        day_time_l.append(t_day)
+# 年齢
+# pig_no = "28-10"
+# p = Day.get(Day.pig_no == pig_no)
+# print(f"{p.add_day}")
+# print(type(p.add_day))
+# ad = datetime.strptime(p.add_day, "%Y/%m/%d")
+# print(ad)
+# print(type(ad))
+# str_ad = ad.strftime("%Y%m%d")
+# print(str_ad)
+# print(type(str_ad))
 
-    idx = 10  # 初期値を設定 possibly unbound 回避
-    for n in range(0, 10):
-        if day_time_l[n].days < 0:
-            idx = day_time_l.index(day_time_l[n])
-            break
-        else:
-            idx = 10
+# today = datetime.now()
+# print(today)
+# print(type(today))
+# str_td = today.strftime("%Y%m%d")
+# print(str_td)
+# print(type(str_td))
 
-    if day_time_l[(idx - 1)].days == 0:
-        rotate = 0  # division by zero 回避
-    else:
-        rotate = 365 / day_time_l[(idx - 1)].days  # 回転数算出
-
-    print(
-        f"NO.{pig_no}",
-        f"出産日:{day_l[idx+2]}",
-        f"出産頭数:{number_l[idx+1]}匹",
-        f"回転数:{round(rotate, 2)}回",
-    )
+# old = int((int(str_td) - int(str_ad) + 600)/10000)
+# print(old)
 
 
 # 最近の出産情報表示コード
-pig_no = "28-10"
-number_l = list_number(pig_no)
-day_l = list_day(pig_no)
-pig_info(pig_no, number_l, day_l)
-
-
-# pig_no = "99-99"
-# li = list_day(pig_no)
-# tstr = li[2]
-# tdatetime = datetime.strptime(tstr, "%Y/%m/%d")
-# print(tdatetime)
-# print(type(tdatetime))
+# pig_no = "28-10"
+# number_l = list_number(pig_no)
+# day_l = list_day(pig_no)
+# pig_info(pig_no, number_l, day_l)
 
 # index 3...day4-day3
 # 回転数はday3-day2...[idx-1]
@@ -328,7 +315,7 @@ pig_info(pig_no, number_l, day_l)
 # 出産頭数はnum4...List[4]...[idx+1]
 # tdatetime = datetime.strptime(tstr, "%Y-%m-%d %H:%M:%S")
 
-# 以下をインライン化
+# 以下をインライン化して関数
 # time_l = []
 # for n in range(2, 13):
 # t_day = datetime.strptime(List[n], "%Y-%m-%d")
@@ -339,23 +326,6 @@ pig_info(pig_no, number_l, day_l)
 # for n in range(10):
 # day_time = time_l[n+1] - time_l[n]
 # day_timne_l.append(day_time)
-
-
-""" 全削除用 """
-
-
-def delete_alldays():  # 全day削除
-    for day in Day.select():
-        day.delete_instance()
-
-
-def delete_allnums():  # 全number削除
-    for num in Number.select():
-        num.delete_instance()
-
-
-# delete_alldays()  # 削除キー
-# delete_allnums()  # 削除キー
 
 
 """ C,Dコマンドで使用 """
@@ -370,6 +340,8 @@ def delete(pig_no):  # 単純削除機能
 
 # pig_no = "99-99"
 # delete(pig_no)
+
+# Fコマンドを使って、すべてのpigの回転数をリスト化
 
 
 """ Dコマンドで使用 """
@@ -387,6 +359,22 @@ def delete_day_set(pig_no):  # 時限爆弾設置
 
 # pig_no = "99-99"
 # delete_day_set(pig_no)
+
+""" 全削除用 """
+
+
+def delete_alldays():  # 全day削除
+    for day in Day.select():
+        day.delete_instance()
+
+
+def delete_allnums():  # 全number削除
+    for num in Number.select():
+        num.delete_instance()
+
+
+# delete_alldays()  # 削除キー
+# delete_allnums()  # 削除キー
 
 
 """
