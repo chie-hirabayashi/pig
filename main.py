@@ -1,4 +1,4 @@
-from parts import create, delete_day_set, pig_info
+from parts import create, delete_day_set, pig_info, search
 from parts import (
     in_born_data1,
     in_born_data2,
@@ -86,4 +86,6 @@ if command == "F":
     pig_info(find_no, number_l, day_l)
 
 
-# コマンドFで実行・・・自動で表示箇所選択
+# コマンドSで実行
+if command == "S":
+    search(list_number, list_day)
