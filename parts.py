@@ -1,15 +1,7 @@
 from datetime import datetime
-
-# from multiprocessing.spawn import old_main_modules
 from db_config import Day
 from db_config import Number
 from dateutil import relativedelta
-
-# for d in Day.select():
-# print(d.pig_no, d.born_day1, d.pub_datetime)
-
-# for n in Number.select():
-# print(type(n.pub_datetime))
 
 
 """ リスト作成 """
@@ -224,15 +216,15 @@ def in_born_data12(pig_no, new_day, new_num):  # born12用関数
 
 
 # 出産情報登録コード
-# pig_no = "99-99"
-# new_day = "2022/8/8"
-# new_num = 8
+pig_no = "28-10"
+new_day = "2022/7/7"
+new_num = 10
 
 # in_born_data1(pig_no, new_day, new_num)  # born1入力
 # in_born_data2(pig_no, new_day, new_num)  # born2入力
 # in_born_data3(pig_no, new_day, new_num)  # born3入力
 # in_born_data4(pig_no, new_day, new_num)  # born4入力
-# in_born_data5(pig_no, new_day, new_num)  # born5入力
+in_born_data5(pig_no, new_day, new_num)  # born5入力
 # in_born_data6(pig_no, new_day, new_num)  # born6入力
 # in_born_data7(pig_no, new_day, new_num)  # born7入力
 # in_born_data8(pig_no, new_day, new_num)  # born8入力
@@ -246,25 +238,26 @@ def in_born_data12(pig_no, new_day, new_num):  # born12用関数
 
 
 def pig_info(pig_no, number_l, day_l):
-    day_time_l = []
+    born_span_l = []
     for n in range(2, 13):
-        t_day = datetime.strptime(day_l[n + 1], "%Y/%m/%d") - datetime.strptime(
+        born_span = datetime.strptime(
+            day_l[n + 1], "%Y/%m/%d") - datetime.strptime(
             day_l[n], "%Y/%m/%d"
         )
-        day_time_l.append(t_day)
+        born_span_l.append(born_span)
 
     idx = 10  # 初期値を設定 possibly unbound 回避
     for n in range(0, 10):  # 直近の出産日index取得
-        if day_time_l[n].days < 0:
-            idx = day_time_l.index(day_time_l[n])
+        if born_span_l[n].days < 0:
+            idx = born_span_l.index(born_span_l[n])
             break
         else:
             idx = 10
 
-    if day_time_l[(idx - 1)].days == 0:
+    if born_span_l[(idx - 1)].days == 0:
         rotate = 0  # division by zero 回避
     else:
-        rotate = 365 / day_time_l[(idx - 1)].days  # 回転数算出
+        rotate = 365 / born_span_l[(idx - 1)].days  # 回転数算出
 
     d = Day.get(Day.pig_no == pig_no)
     add_day = (datetime.strptime(d.add_day, "%Y/%m/%d")).strftime("%Y%m%d")
@@ -359,16 +352,17 @@ def search(list_number, list_day):
         # rotate算出
         number_l = list_number(pig_no)
         day_l = list_day(pig_no)
-        day_time_l = []
+        born_span_l = []
         for n in range(2, 13):
-            t_day = datetime.strptime(day_l[n + 1], "%Y/%m/%d") - datetime.strptime(
+            born_span = datetime.strptime(
+                day_l[n + 1], "%Y/%m/%d") - datetime.strptime(
                 day_l[n], "%Y/%m/%d"
             )
-            day_time_l.append(t_day)
+            born_span_l.append(born_span)
         idx = 10  # 初期値を設定 possibly unbound 回避
         for n in range(0, 10):  # 直近の出産日index取得
-            if day_time_l[n].days < 0:
-                idx = day_time_l.index(day_time_l[n])
+            if born_span_l[n].days < 0:
+                idx = born_span_l.index(born_span_l[n])
                 if idx == 0:  # pig_noが産子数(2)に入る防止
                     idx = 1
                 else:
@@ -376,10 +370,10 @@ def search(list_number, list_day):
                 break
             else:
                 idx = 10
-        if day_time_l[(idx - 1)].days == 0:
+        if born_span_l[(idx - 1)].days == 0:
             rotate = 0  # division by zero 回避
         else:
-            rotate = 365 / day_time_l[(idx - 1)].days  # 回転数算出
+            rotate = 365 / born_span_l[(idx - 1)].days  # 回転数算出
             if rotate < 0:  # 過去1回しか出産していない場合rotateがマイナスになる防止
                 rotate = 0
             else:
@@ -387,7 +381,13 @@ def search(list_number, list_day):
 
         # 辞書リスト作成
         key = ["pig_no", "age", "rotate", "num1", "num2"]
-        value = [pig_no, age, f"{round(rotate,2)}", number_l[idx], number_l[idx + 1]]
+        value = [
+            pig_no,
+            age,
+            f"{round(rotate,2)}",
+            number_l[idx],
+            number_l[idx + 1]
+            ]
         p_dic = dict(zip(key, value))  # すべてのpigの辞書作成
         all_pig_l.append(p_dic)  # すべてのpigの辞書をリスト化
 
@@ -408,7 +408,8 @@ def search(list_number, list_day):
             pass
 
 
-search(list_number, list_day)
+# 最後の出産日から165日経過した個体も抽出！！
+# search(list_number, list_day)
 
 
 """
